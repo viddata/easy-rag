@@ -1,0 +1,68 @@
+What is Retrieval-Augmented Generation (RAG)?
+
+RAG ek technique hai jo Large Language Models (LLMs) ko external knowledge se combine karta hai. Normally, ek LLM sirf wahi jaanta hai jo training ke time sikha — uske baad ki koi bhi information usse nahi pata. RAG yeh problem solve karta hai by giving the model access to your own documents at query time.
+
+How RAG Works — 3 Simple Steps:
+
+Step 1: Indexing (Ek baar hota hai)
+- Apne documents (PDFs, text files, FAQs, manuals) ko lo.
+- Unhe chhote-chhote chunks me split karo (e.g. 500 words each).
+- Har chunk ko ek "embedding" (numbers ka vector) me convert karo using an embedding model.
+- Yeh vectors ek vector database me store karo (e.g. FAISS, Chroma, Pinecone).
+
+Step 2: Retrieval (Har query pe hota hai)
+- User ka question aata hai.
+- Uss question ko bhi embedding me convert karo.
+- Vector database me search karo — sabse similar chunks dhundho.
+- Top-k relevant chunks retrieve karo.
+
+Step 3: Generation (Har query pe hota hai)
+- Retrieved chunks ko context ke taur pe LLM ko dete ho.
+- LLM user ka question aur yeh context dekh ke answer generate karta hai.
+- Answer accurate hota hai kyunki woh real documents pe based hai.
+
+Why RAG is Better than Just Using an LLM:
+
+1. No hallucinations: LLM apne documents pe based answer deta hai, imagination pe nahi.
+2. Always up to date: Naye documents add karo, model ko retrain mat karo.
+3. Cost effective: Fine-tuning se zyada sasta aur fast hai.
+4. Traceable: Har answer ka source pata chalta hai — trust badh jaata hai.
+
+Common RAG Use Cases:
+- Customer support chatbot for a company's product documentation
+- Internal HR chatbot (HR policies, leave rules, salary info)
+- Legal document Q&A
+- Medical literature search
+- Real estate property information assistant
+- Student notes Q&A system
+
+RAG vs Fine-Tuning:
+- RAG: Documents ko runtime pe context me dete ho. Fast, cheap, updatable.
+- Fine-tuning: Model ko naye data pe retrain karte ho. Slow, expensive, but model style/tone change ho sakti hai.
+- Best practice: Dono combine karo for maximum performance.
+
+Key Terms to Know:
+- Embedding: Text ka numerical representation (vector).
+- Vector store / Vector DB: Embeddings store karne ki database.
+- Chunk: Document ka ek chhota piece (typically 200–500 words).
+- Top-k retrieval: Query ke liye k sabse similar chunks nikalna.
+- Context window: LLM kitna text ek baar read kar sakta hai.
+
+Popular Tools in RAG Stack:
+- LangChain / LlamaIndex: RAG orchestration frameworks
+- OpenAI Embeddings / Voyage AI: Embedding models
+- FAISS (Facebook): Fast in-memory vector search
+- Chroma: Easy-to-use local vector database
+- Pinecone / Weaviate: Cloud vector databases
+- GPT-4o, Claude 3.5: LLMs for generation
+
+Getting Started — Minimal RAG in Python:
+
+  from easy_rag import RAGPipeline
+  
+  rag = RAGPipeline(provider='openai')
+  rag.ingest_file('my_document.txt')
+  result = rag.ask('What is the refund policy?')
+  print(result['answer'])
+
+That's it. Bas 4 lines me apna RAG system ready!
