@@ -404,7 +404,14 @@ with gr.Blocks(title="🔍 easy-rag") as demo:
 if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",
-        server_port=7860,
+        port = int(os.getenv("PORT", 7860))
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=port,
+        share=False,
+        css=custom_css,
+    )
+if False:
         share=False,
         css=custom_css,
     )

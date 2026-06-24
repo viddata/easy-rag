@@ -1,20 +1,9 @@
-# Core
 openai>=1.30.0
 anthropic>=0.28.0
 numpy>=1.26.0
-
-# Web UI (optional)
 gradio>=4.36.0
-
-# PDF support (optional)
 pypdf>=4.0.0
-
-# Environment variables
 python-dotenv>=1.0.0
-
-# Jupyter notebooks (optional)
-jupyter>=1.0.0
-ipykernel>=6.0.0
-
-# Voyage AI embeddings (optional, for Anthropic provider)
-# voyageai>=0.2.0
+sentence-transformers>=2.7.0
+torch>=2.0.0
+transformers>=4.40.0

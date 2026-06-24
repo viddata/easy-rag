@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: easy-rag
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/app.py
+    envVars:
+      - key: RAG_PROVIDER
+        value: groq
+      - key: RAG_LLM_MODEL
+        value: llama-3.3-70b-versatile
+      - key: RAG_STORE_PATH
+        value: vector_store.json
+      - key: GROQ_API_KEY
+        sync: false
