@@ -315,7 +315,7 @@ header_html = f"""
 """
 
 # ── UI ────────────────────────────────────────────────────────────────────────
-with gr.Blocks(css=custom_css, title="🔍 easy-rag") as demo:
+with gr.Blocks(title="🔍 easy-rag") as demo:
 
     gr.HTML(header_html)
 
@@ -371,7 +371,6 @@ with gr.Blocks(css=custom_css, title="🔍 easy-rag") as demo:
                 label="",
                 placeholder="<div style='text-align:center;color:#334155;padding:60px 20px'><div style='font-size:2.5rem'>🔍</div><div style='font-size:1.1rem;margin-top:8px;font-family:Space Grotesk'>Documents upload karo aur sawaal poochho</div><div style='font-size:0.85rem;margin-top:6px;color:#475569'>AI tumhare apne documents se jawab dega</div></div>",
                 show_label=False,
-                bubble_full_width=False,
             )
             with gr.Row():
                 q_input = gr.Textbox(
@@ -407,5 +406,5 @@ if __name__ == "__main__":
         server_name="0.0.0.0",
         server_port=7860,
         share=False,
-        favicon_path=None,
+        css=custom_css,
     )
