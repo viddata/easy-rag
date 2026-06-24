@@ -1,6 +1,6 @@
 """
 easy-rag — Core RAG Engine
-Works with OpenAI, Anthropic, or any OpenAI-compatible API.
+Works with OpenAI, Anthropic, Groq, or any OpenAI-compatible API.
 """
 
 import os
@@ -88,12 +88,13 @@ class RAGPipeline:
     Supports:
       - provider="openai"     (gpt-4o, text-embedding-3-small)
       - provider="anthropic"  (claude-3-5-haiku, voyage-3 embeddings)
+      - provider="groq"       (llama-3.3-70b-versatile, FREE + fast)
     """
 
     def __init__(
         self,
-        provider: str = "openai",
-        llm_model: str = "gpt-4o-mini",
+        provider: str = "groq",
+        llm_model: str = "llama-3.3-70b-versatile",
         embed_model: str = "text-embedding-3-small",
         store_path: str = "vector_store.json",
         chunk_size: int = 500,
@@ -117,15 +118,25 @@ class RAGPipeline:
         if self.provider == "openai":
             from openai import OpenAI
             self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        elif self.provider == "groq":
+            # Groq uses OpenAI-compatible SDK — FREE tier available
+            from openai import OpenAI
+            self.client = OpenAI(
+                api_key=os.getenv("GROQ_API_KEY"),
+                base_url="https://api.groq.com/openai/v1",
+            )
         elif self.provider == "anthropic":
             import anthropic
             self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         else:
-            raise ValueError(f"Unknown provider: {self.provider}. Use 'openai' or 'anthropic'.")
+            raise ValueError(f"Unknown provider: {self.provider}. Use 'openai', 'groq', or 'anthropic'.")
 
     # ── Embedding ─────────────────────────────────────────────────────────────
     def embed(self, text: str) -> List[float]:
-        if self.provider == "openai":
+        if self.provider in ("openai", "groq"):
+            # Groq doesn't have embeddings yet — use a free local alternative
+            if self.provider == "groq":
+                return self._embed_local(text)
             resp = self.client.embeddings.create(input=text, model=self.embed_model)
             return resp.data[0].embedding
         elif self.provider == "anthropic":
@@ -134,6 +145,24 @@ class RAGPipeline:
             vo = voyageai.Client(api_key=os.getenv("VOYAGE_API_KEY"))
             result = vo.embed([text], model=self.embed_model)
             return result.embeddings[0]
+
+    def _embed_local(self, text: str) -> List[float]:
+        """
+        Free local embeddings using sentence-transformers.
+        Used automatically when provider='groq' (Groq has no embedding API).
+        Install: pip install sentence-transformers
+        """
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError:
+            raise ImportError(
+                "Groq provider ke liye sentence-transformers chahiye.\n"
+                "Run karo: pip install sentence-transformers"
+            )
+        if not hasattr(self, "_st_model"):
+            print("⏳ Embedding model load ho raha hai (pehli baar thoda time lagega)...")
+            self._st_model = SentenceTransformer("all-MiniLM-L6-v2")
+        return self._st_model.encode(text).tolist()
 
     # ── Ingest ────────────────────────────────────────────────────────────────
     def ingest_text(self, text: str, source: str = "unknown"):
@@ -206,7 +235,7 @@ class RAGPipeline:
 
         user_msg = f"Context:\n{context}\n\nQuestion: {question}"
 
-        if self.provider == "openai":
+        if self.provider in ("openai", "groq"):
             resp = self.client.chat.completions.create(
                 model=self.llm_model,
                 messages=[
